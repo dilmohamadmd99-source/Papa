@@ -2,10 +2,12 @@
 @import "prismjs/themes/prism-tomorrow.css";
 
 body {
-  background-color: #08090e;
+  background-color: #030407;
   color: #f3f4f6;
   overflow: hidden;
   user-select: text;
+  background-image: radial-gradient(circle at 50% 0%, rgba(20, 15, 38, 0.45) 0%, rgba(3, 4, 7, 0.98) 75%);
+  background-attachment: fixed;
 }
 
 /* Custom Sleek Scrollbar */

@@ -136,6 +136,103 @@ export async function verifyPayment(payload: {
   return res.json();
 }
 
+export async function submitUpiPayment(payload: {
+  utrNumber: string;
+  planId: string;
+  planName: string;
+  amount: number;
+  durationMonths: number;
+  userId: string;
+  userEmail: string;
+}) {
+  const res = await fetch('/api/payments/submit-upi', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to submit UPI payment');
+  }
+  return res.json();
+}
+
+export async function getUserSubscriptionStatus(userId: string) {
+  const res = await fetch(`/api/subscription/user-status?userId=${encodeURIComponent(userId)}`);
+  if (!res.ok) return { subscription: null, pendingUpi: [] };
+  return res.json();
+}
+
+export async function getPendingUpiPayments(adminEmail: string) {
+  const res = await fetch('/api/admin/pending-upi', {
+    headers: { 'x-admin-email': adminEmail },
+  });
+  if (!res.ok) throw new Error('Failed to fetch pending UPI payments');
+  return res.json();
+}
+
+export async function approveUpiPayment(adminEmail: string, payload: {
+  id: string;
+  targetUserId: string;
+  planId: string;
+  durationMonths: number;
+  amount: number;
+}) {
+  const res = await fetch('/api/admin/approve-upi', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-email': adminEmail,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to approve UPI payment');
+  }
+  return res.json();
+}
+
+export async function rejectUpiPayment(adminEmail: string, payload: {
+  id: string;
+  reason?: string;
+}) {
+  const res = await fetch('/api/admin/reject-upi', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-email': adminEmail,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to reject UPI payment');
+  }
+  return res.json();
+}
+
+export async function grantUserSubscription(adminEmail: string, payload: {
+  targetUserId: string;
+  targetUserEmail: string;
+  planId: string;
+  durationMonths: number;
+}) {
+  const res = await fetch('/api/admin/grant-subscription', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-admin-email': adminEmail,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to grant subscription');
+  }
+  return res.json();
+}
+
 export async function getAdminMetrics(adminEmail: string) {
   const res = await fetch('/api/admin/metrics', {
     headers: {
@@ -163,7 +260,13 @@ export async function updateAIConfig(adminEmail: string, config: { freeDailyLimi
 
 export async function getPaymentConfig() {
   const res = await fetch('/api/payments/config');
-  if (!res.ok) return { keyId: 'rzp_test_rehanai_live', merchantUpiId: 'dilmhamadmiya2378@upi' };
+  if (!res.ok) return {
+    keyId: 'rzp_test_rehanai_live',
+    merchantUpiId: '6206800093@ybl',
+    merchantSecondaryUpiId: 'dilmhamadmiya2378@upi',
+    merchantPhone: '+91 6206800093',
+    merchantName: 'Dil Mohamad',
+  };
   return res.json();
 }
 
@@ -180,6 +283,8 @@ export async function updateAdminRazorpayConfig(adminEmail: string, payload: {
   keySecret?: string;
   webhookSecret?: string;
   merchantUpiId?: string;
+  merchantSecondaryUpiId?: string;
+  merchantPhone?: string;
   merchantName?: string;
 }) {
   const res = await fetch('/api/admin/razorpay-config', {

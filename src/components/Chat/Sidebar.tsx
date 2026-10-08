@@ -78,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 w-72 bg-[#0c0d14] border-r border-white/10 flex flex-col z-35 transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed md:static inset-y-0 left-0 w-72 bg-[#05060b] border-r border-white/[0.07] flex flex-col z-35 transition-transform duration-300 md:translate-x-0 ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -119,7 +119,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search chat history..."
-              className="w-full bg-[#131522] border border-white/5 rounded-xl pl-8 pr-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
+              className="w-full bg-[#080911] border border-white/[0.08] rounded-xl pl-8 pr-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-purple-500/50"
             />
           </div>
         </div>
@@ -144,8 +144,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   }}
                   className={`group relative flex items-center justify-between p-2.5 rounded-xl text-xs cursor-pointer transition-all ${
                     isActive
-                      ? 'bg-purple-950/40 text-purple-200 border border-purple-500/30'
-                      : 'text-gray-400 hover:text-gray-200 hover:bg-white/5 border border-transparent'
+                      ? 'bg-[#0d0e1b] text-purple-200 border border-purple-500/40 shadow-sm'
+                      : 'text-gray-400 hover:text-gray-200 hover:bg-white/[0.04] border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 overflow-hidden flex-1">
@@ -217,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Footer: Plan status card */}
-        <div className="p-3 border-t border-white/10 bg-[#0e101a]">
+        <div className="p-3 border-t border-white/[0.08] bg-[#04050a]">
           {!isPremium ? (
             <div className="p-3 rounded-xl bg-gradient-to-br from-purple-900/30 to-indigo-900/20 border border-purple-500/30 text-xs">
               <div className="flex items-center justify-between font-semibold text-purple-200">

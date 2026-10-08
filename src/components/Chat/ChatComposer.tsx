@@ -141,11 +141,11 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
   });
 
   return (
-    <div className="p-4 bg-[#0c0d14]/95 border-t border-white/10 backdrop-blur-md">
+    <div className="p-4 bg-[#040509]/95 border-t border-white/[0.08] backdrop-blur-md">
       <div className="max-w-4xl mx-auto">
         {/* Attachment chips */}
         {attachments.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-2 p-2 rounded-xl bg-[#141724] border border-white/10">
+          <div className="flex flex-wrap gap-2 mb-2 p-2 rounded-xl bg-[#080911] border border-white/[0.08]">
             {attachments.map((att) => (
               <div
                 key={att.id}
@@ -170,7 +170,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
         )}
 
         {/* Input box */}
-        <div className="relative rounded-2xl bg-[#141624] border border-white/15 focus-within:border-purple-500/60 focus-within:ring-2 focus-within:ring-purple-500/20 shadow-2xl transition-all">
+        <div className="relative rounded-2xl bg-[#080911] border border-white/[0.09] focus-within:border-purple-500/60 focus-within:ring-2 focus-within:ring-purple-500/20 shadow-2xl transition-all">
           <textarea
             ref={textareaRef}
             rows={1}
@@ -235,7 +235,7 @@ export const ChatComposer: React.FC<ChatComposerProps> = ({
                       className="fixed inset-0 z-40"
                       onClick={() => setModelDropdownOpen(false)}
                     />
-                    <div className="absolute left-0 bottom-full mb-2 w-80 sm:w-96 bg-[#141626] border border-purple-500/30 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 backdrop-blur-xl">
+                    <div className="absolute left-0 bottom-full mb-2 w-80 sm:w-96 bg-[#070812] border border-white/[0.12] rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 backdrop-blur-xl">
                       {/* Dropdown Header */}
                       <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
                         <div className="flex items-center gap-1.5">

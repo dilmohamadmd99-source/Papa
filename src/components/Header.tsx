@@ -44,13 +44,13 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="h-16 bg-[#0c0d14]/90 backdrop-blur-md border-b border-white/10 px-4 flex items-center justify-between sticky top-0 z-40 select-none">
+    <header className="h-16 bg-[#040509]/95 backdrop-blur-xl border-b border-white/[0.08] px-4 flex items-center justify-between sticky top-0 z-40 select-none">
       {/* Brand & Mobile Toggle */}
       <div className="flex items-center gap-3">
         {activeView !== 'chat' && (
           <button
             onClick={() => setActiveView('chat')}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/25 hover:bg-purple-600/40 text-purple-200 border border-purple-500/30 text-xs font-bold transition-all active:scale-95 shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-600/20 hover:bg-purple-600/35 text-purple-200 border border-purple-500/30 text-xs font-bold transition-all active:scale-95 shadow-sm"
             title="Back to AI Chat"
           >
             <ArrowLeft className="w-4 h-4 text-purple-300" />
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* View Switcher Tabs */}
-      <div className="hidden md:flex items-center gap-1 bg-[#141622] p-1 rounded-xl border border-white/10">
+      <div className="hidden md:flex items-center gap-1 bg-[#07080f] p-1 rounded-xl border border-white/[0.08]">
         <button
           onClick={() => setActiveView('chat')}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
@@ -193,8 +193,8 @@ export const Header: React.FC<HeaderProps> = ({
                   className="fixed inset-0 z-40"
                   onClick={() => setUserDropdownOpen(false)}
                 />
-                <div className="absolute right-0 mt-2 w-64 bg-[#141624] border border-white/15 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95">
-                  <div className="px-3 py-2.5 border-b border-white/10">
+                <div className="absolute right-0 mt-2 w-64 bg-[#080912] border border-white/10 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in zoom-in-95">
+                  <div className="px-3 py-2.5 border-b border-white/[0.08]">
                     <p className="text-sm font-semibold text-white truncate">
                       {profile?.displayName || 'User'}
                     </p>

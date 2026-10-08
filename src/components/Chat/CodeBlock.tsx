@@ -56,9 +56,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ language, code, onOpenInWo
   }, [code, language]);
 
   return (
-    <div className="my-3.5 rounded-2xl overflow-hidden border border-white/15 bg-[#0a0c13] shadow-2xl text-xs font-mono">
+    <div className="my-3.5 rounded-2xl overflow-hidden border border-white/[0.10] bg-[#030407] shadow-2xl text-xs font-mono">
       {/* Code Header Bar */}
-      <div className="bg-[#121522] px-4 py-2.5 flex items-center justify-between border-b border-white/10 select-none">
+      <div className="bg-[#070810] px-4 py-2.5 flex items-center justify-between border-b border-white/[0.08] select-none">
         <div className="flex items-center gap-2">
           <Code2 className="w-4 h-4 text-purple-400" />
           <span className="text-[11px] font-bold text-purple-200 uppercase tracking-wider font-mono">

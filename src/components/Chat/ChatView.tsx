@@ -295,7 +295,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
         onCloseMobile={() => setIsSidebarOpenMobile(false)}
       />
 
-      <div className="flex-1 flex flex-col bg-[#0b0c13] overflow-hidden">
+      <div className="flex-1 flex flex-col bg-[#030407] overflow-hidden">
         {messages.length === 0 && !isStreaming ? (
           /* Empty Chat Welcome Hero */
           <div className="flex-1 overflow-y-auto px-4 py-8 flex items-center justify-center">
@@ -314,7 +314,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
               </div>
 
               {/* Multi-AI Engine Selector (OpenAI, DeepSeek, Claude, Meta, Gemini) */}
-              <div className="bg-[#121422] border border-white/10 rounded-2xl p-3 sm:p-4 text-left shadow-xl">
+              <div className="bg-[#07080f] border border-white/[0.08] rounded-2xl p-3 sm:p-4 text-left shadow-2xl">
                 <div className="flex items-center justify-between mb-2.5">
                   <span className="text-xs font-bold text-gray-200 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-purple-400" />
@@ -334,7 +334,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
                           isSelected
                             ? 'bg-purple-600 text-white font-bold shadow-lg shadow-purple-900/40 ring-2 ring-purple-400'
-                            : 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/5'
+                            : 'bg-white/[0.04] hover:bg-white/[0.08] text-gray-300 hover:text-white border border-white/[0.06]'
                         }`}
                       >
                         <span className={`w-2 h-2 rounded-full ${modelItem.dotColor}`} />
@@ -385,7 +385,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
                   <button
                     key={idx}
                     onClick={() => handleSendMessage(item.prompt, [], selectedModel)}
-                    className="p-4 rounded-2xl bg-[#141624] hover:bg-[#1a1d30] border border-white/10 hover:border-purple-500/40 transition-all text-left group shadow-lg"
+                    className="p-4 rounded-2xl bg-[#080911] hover:bg-[#0e101d] border border-white/[0.08] hover:border-purple-500/40 transition-all text-left group shadow-lg"
                   >
                     <div className="flex items-center gap-2.5 text-purple-400 mb-1.5">
                       <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform" />

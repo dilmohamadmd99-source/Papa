@@ -15,10 +15,25 @@ import {
   QrCode,
   Save,
   ArrowLeft,
+  Clock,
+  Check,
+  X,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getAdminMetrics, updateAIConfig, getAdminRazorpayConfig, updateAdminRazorpayConfig } from '../../services/api';
+import {
+  getAdminMetrics,
+  updateAIConfig,
+  getAdminRazorpayConfig,
+  updateAdminRazorpayConfig,
+  getPendingUpiPayments,
+  approveUpiPayment,
+  rejectUpiPayment,
+  grantUserSubscription,
+} from '../../services/api';
 import { DEFAULT_PLANS } from '../../firebase/db';
+import type { UpiPaymentSubmission } from '../../types';
 
 interface AdminPanelProps {
   onBackToChat?: () => void;
@@ -26,7 +41,7 @@ interface AdminPanelProps {
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
   const { user, isOwner } = useAuth();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'payments' | 'razorpay' | 'plans' | 'ai' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'upi' | 'users' | 'payments' | 'razorpay' | 'plans' | 'ai' | 'logs'>('overview');
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,12 +49,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
   const [freeLimitInput, setFreeLimitInput] = useState(30);
   const [plans, setPlans] = useState(DEFAULT_PLANS);
 
-  // Razorpay Gateway Settings for dilmhamadmiya2378
+  // Pending UPI Submissions Queue
+  const [pendingUpiList, setPendingUpiList] = useState<UpiPaymentSubmission[]>([]);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
+
+  // Direct Subscription Granting Form
+  const [grantEmailInput, setGrantEmailInput] = useState('');
+  const [grantPlanInput, setGrantPlanInput] = useState('yearly');
+  const [grantLoading, setGrantLoading] = useState(false);
+
+  // Razorpay Gateway Settings for Dil Mohamad (PhonePe + Razorpay)
   const [rzpKeyId, setRzpKeyId] = useState('rzp_test_rehanai_live');
   const [rzpKeySecret, setRzpKeySecret] = useState('secret_rehanai_mock_key');
   const [rzpWebhookSecret, setRzpWebhookSecret] = useState('whsec_rehanai');
-  const [merchantUpiId, setMerchantUpiId] = useState('dilmhamadmiya2378@upi');
-  const [merchantName, setMerchantName] = useState('Dil Mhamad Miya');
+  const [merchantUpiId, setMerchantUpiId] = useState('6206800093@ybl');
+  const [merchantName, setMerchantName] = useState('Dil Mohamad');
   const [rzpSavedMessage, setRzpSavedMessage] = useState<string | null>(null);
 
   const fetchMetrics = async () => {
@@ -59,10 +84,78 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
         if (rzpData.merchantUpiId) setMerchantUpiId(rzpData.merchantUpiId);
         if (rzpData.merchantName) setMerchantName(rzpData.merchantName);
       }
+
+      const upiSubmissions = await getPendingUpiPayments(user.email).catch(() => []);
+      if (Array.isArray(upiSubmissions)) {
+        setPendingUpiList(upiSubmissions);
+      }
     } catch (err: any) {
       setError(err.message || 'Access restricted');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleApproveUpi = async (item: UpiPaymentSubmission) => {
+    if (!user?.email) return;
+    setActionLoadingId(item.id);
+    setActionNotice(null);
+    try {
+      await approveUpiPayment(user.email, {
+        id: item.id,
+        targetUserId: item.userId,
+        planId: item.planId,
+        durationMonths: item.durationMonths,
+        amount: item.amount,
+      });
+      setActionNotice(`✓ Approved UTR ${item.utrNumber} for ${item.userEmail}! Plan activated.`);
+      await fetchMetrics();
+    } catch (err: any) {
+      alert(`Approval error: ${err.message}`);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleRejectUpi = async (item: UpiPaymentSubmission) => {
+    if (!user?.email) return;
+    const reason = prompt('Reject reason (उदा. "Transaction not found in bank account / Fake UTR"):', 'Fake payment / UTR not found in bank account');
+    if (!reason) return;
+
+    setActionLoadingId(item.id);
+    setActionNotice(null);
+    try {
+      await rejectUpiPayment(user.email, {
+        id: item.id,
+        reason,
+      });
+      setActionNotice(`✕ Rejected fake UTR ${item.utrNumber} from ${item.userEmail}.`);
+      await fetchMetrics();
+    } catch (err: any) {
+      alert(`Reject error: ${err.message}`);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  const handleDirectGrant = async () => {
+    if (!user?.email || !grantEmailInput.trim()) return;
+    setGrantLoading(true);
+    try {
+      const durationMonths = grantPlanInput === 'yearly' ? 12 : grantPlanInput === '6months' ? 6 : grantPlanInput === '3months' ? 3 : 1;
+      await grantUserSubscription(user.email, {
+        targetUserId: 'user_' + grantEmailInput.trim().replace(/[^a-zA-Z0-9]/g, '_'),
+        targetUserEmail: grantEmailInput.trim(),
+        planId: grantPlanInput,
+        durationMonths,
+      });
+      alert(`Successfully granted ${grantPlanInput} to ${grantEmailInput.trim()}!`);
+      setGrantEmailInput('');
+      await fetchMetrics();
+    } catch (err: any) {
+      alert(`Grant error: ${err.message}`);
+    } finally {
+      setGrantLoading(false);
     }
   };
 
@@ -164,9 +257,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
   );
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0b0c13] text-gray-200 overflow-y-auto">
+    <div className="flex-1 flex flex-col bg-[#030408] text-gray-200 overflow-y-auto">
       {/* Top Banner */}
-      <div className="p-6 bg-gradient-to-r from-[#141626] to-[#1a1226] border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 bg-gradient-to-r from-[#0a0b14] to-[#0d0918] border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/30">
@@ -202,9 +295,15 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
       </div>
 
       {/* Admin Tab Navigation */}
-      <div className="px-6 border-b border-white/10 bg-[#0d0f1a] flex gap-2 overflow-x-auto scrollbar-none">
+      <div className="px-6 border-b border-white/[0.08] bg-[#05060c] flex gap-2 overflow-x-auto scrollbar-none">
         {[
           { id: 'overview', label: 'Overview & Metrics', icon: TrendingUp },
+          {
+            id: 'upi',
+            label: `UPI Approvals (${pendingUpiList.filter((p) => p.status === 'pending').length})`,
+            icon: Clock,
+            badge: pendingUpiList.filter((p) => p.status === 'pending').length,
+          },
           { id: 'users', label: 'User Directory', icon: Users },
           { id: 'payments', label: 'Razorpay Transactions', icon: CreditCard },
           { id: 'razorpay', label: 'Razorpay Gateway (dilmhamadmiya2378)', icon: QrCode },
@@ -223,12 +322,26 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
           >
             <tab.icon className="w-3.5 h-3.5" />
             <span>{tab.label}</span>
+            {tab.badge && tab.badge > 0 ? (
+              <span className="px-1.5 py-0.2 rounded-full bg-rose-500 text-white text-[10px] font-extrabold animate-pulse">
+                {tab.badge}
+              </span>
+            ) : null}
           </button>
         ))}
       </div>
 
       {/* Main Tab Content */}
       <div className="p-6 max-w-7xl mx-auto w-full space-y-6">
+        {actionNotice && (
+          <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs font-bold flex items-center justify-between">
+            <span>{actionNotice}</span>
+            <button onClick={() => setActionNotice(null)} className="text-gray-400 hover:text-white">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         {/* TAB 1: OVERVIEW */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
@@ -269,20 +382,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
                   ₹{metrics?.totalRevenue || 5490}
                 </div>
                 <div className="text-[11px] text-emerald-400 mt-1">
-                  Razorpay verified
+                  Verified revenue
                 </div>
               </div>
 
               <div className="p-4 rounded-2xl bg-[#141624] border border-white/10 shadow-lg">
                 <div className="flex items-center justify-between text-gray-400 text-xs">
-                  <span>AI Queries Run</span>
-                  <TrendingUp className="w-4 h-4 text-rose-400" />
+                  <span>Pending UPI Verification</span>
+                  <Clock className="w-4 h-4 text-rose-400" />
                 </div>
-                <div className="text-2xl font-black text-white mt-2">
-                  {metrics?.aiRequestsCount || 142}
+                <div className="text-2xl font-black text-rose-300 mt-2">
+                  {pendingUpiList.filter((p) => p.status === 'pending').length}
                 </div>
-                <div className="text-[11px] text-purple-300 mt-1">
-                  Gemini API active
+                <div className="text-[11px] text-gray-400 mt-1">
+                  Awaiting bank check
                 </div>
               </div>
             </div>
@@ -290,12 +403,153 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
             {/* Quick Summary Card */}
             <div className="p-5 rounded-2xl bg-[#131522] border border-white/10 space-y-3">
               <h3 className="font-bold text-sm text-white flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-400" />
-                Platform Security Status: Operational
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                Anti-Fraud & Payment Security Engine: Active
               </h3>
               <p className="text-xs text-gray-400 leading-relaxed">
-                All Firestore security rules are actively deployed. Razorpay signature verification HMAC-SHA256 is enforced. Google OAuth tokens are verified server-side.
+                Fake payment bypassing has been completely eliminated. Real Razorpay HMAC-SHA256 signatures are enforced on all gateway payments, and direct UPI transfers to <strong>dilmhamadmiya2378@upi</strong> require manual 12-digit UTR confirmation in this owner panel before any premium plan is activated.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 1B: UPI APPROVALS */}
+        {activeTab === 'upi' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-purple-400" />
+                  <span>UPI Payment Approvals (पेमेंट सत्यापन केंद्र)</span>
+                </h3>
+                <p className="text-xs text-gray-400 mt-1">
+                  Users who transferred to <strong>{merchantUpiId}</strong> submitted their 12-digit UTR below. Check your bank/UPI statement and approve or reject.
+                </p>
+              </div>
+
+              <button
+                onClick={fetchMetrics}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-gray-200 border border-white/10 w-fit"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh Queue</span>
+              </button>
+            </div>
+
+            {/* Direct Grant Subscription Card */}
+            <div className="p-4 rounded-2xl bg-[#141624] border border-purple-500/30 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold text-white">
+                <Zap className="w-4 h-4 text-amber-400" />
+                <span>Directly Grant Pro Subscription (बिना पेमेंट यूजर को प्रो दें)</span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <input
+                  type="email"
+                  value={grantEmailInput}
+                  onChange={(e) => setGrantEmailInput(e.target.value)}
+                  placeholder="Enter User Email (e.g. user@gmail.com)"
+                  className="flex-1 w-full bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                />
+                <select
+                  value={grantPlanInput}
+                  onChange={(e) => setGrantPlanInput(e.target.value)}
+                  className="bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500"
+                >
+                  <option value="monthly">Monthly Pro (1 Month)</option>
+                  <option value="3months">3 Months Quarter</option>
+                  <option value="6months">6 Months Half-Year</option>
+                  <option value="yearly">Yearly Ultimate (1 Year)</option>
+                </select>
+                <button
+                  onClick={handleDirectGrant}
+                  disabled={grantLoading || !grantEmailInput.trim()}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 text-white font-bold text-xs disabled:opacity-50 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Check className="w-3.5 h-3.5" />
+                  <span>{grantLoading ? 'Granting...' : 'Grant Pro'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Submissions Table */}
+            <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#131522]">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#171a2b] text-gray-400 uppercase text-[10px]">
+                  <tr>
+                    <th className="p-3">12-Digit UTR Number</th>
+                    <th className="p-3">User Email</th>
+                    <th className="p-3">Plan</th>
+                    <th className="p-3">Amount</th>
+                    <th className="p-3">Submitted At</th>
+                    <th className="p-3">Status</th>
+                    <th className="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {pendingUpiList.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="p-8 text-center text-gray-500">
+                        No UPI submissions in queue.
+                      </td>
+                    </tr>
+                  ) : (
+                    pendingUpiList.map((item) => (
+                      <tr key={item.id} className="hover:bg-white/5">
+                        <td className="p-3">
+                          <span className="font-mono font-bold text-purple-300 text-xs select-all bg-purple-950/40 px-2 py-1 rounded-lg border border-purple-500/30">
+                            {item.utrNumber}
+                          </span>
+                        </td>
+                        <td className="p-3 text-gray-300 font-mono text-[11px]">{item.userEmail}</td>
+                        <td className="p-3 text-white font-semibold">{item.planName}</td>
+                        <td className="p-3 text-emerald-400 font-bold">₹{item.amount}</td>
+                        <td className="p-3 text-gray-400 font-mono text-[11px]">
+                          {item.submittedAt ? new Date(item.submittedAt).toLocaleString() : 'N/A'}
+                        </td>
+                        <td className="p-3">
+                          <span
+                            className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              item.status === 'approved'
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : item.status === 'rejected'
+                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                : 'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                            }`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          {item.status === 'pending' ? (
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleApproveUpi(item)}
+                                disabled={actionLoadingId === item.id}
+                                className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-md transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                              >
+                                <Check className="w-3.5 h-3.5" />
+                                <span>Approve Plan</span>
+                              </button>
+                              <button
+                                onClick={() => handleRejectUpi(item)}
+                                disabled={actionLoadingId === item.id}
+                                className="px-3 py-1 rounded-xl bg-rose-600/30 hover:bg-rose-600/50 text-rose-200 border border-rose-500/40 font-bold text-xs flex items-center gap-1 transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                <span>Reject Fake</span>
+                              </button>
+                            </div>
+                          ) : item.status === 'approved' ? (
+                            <span className="text-[11px] text-emerald-400 font-semibold">✓ Plan Activated</span>
+                          ) : (
+                            <span className="text-[11px] text-rose-400 font-semibold">✕ Rejected ({item.rejectReason || 'Fake'})</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -446,27 +700,27 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBackToChat }) => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-400 block mb-1">
-                    Merchant Name
+                    Merchant Name (PhonePe / UPI)
                   </label>
                   <input
                     type="text"
                     value={merchantName}
                     onChange={(e) => setMerchantName(e.target.value)}
                     className="w-full bg-black/60 border border-white/10 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-purple-500"
-                    placeholder="Dil Mhamad Miya"
+                    placeholder="Dil Mohamad"
                   />
                 </div>
 
                 <div>
                   <label className="text-xs text-gray-400 block mb-1">
-                    Business UPI Handle / VPA (dilmhamadmiya2378)
+                    Business UPI Handle / VPA (6206800093@ybl)
                   </label>
                   <input
                     type="text"
                     value={merchantUpiId}
                     onChange={(e) => setMerchantUpiId(e.target.value)}
                     className="w-full bg-black/60 border border-purple-500/40 rounded-xl p-2.5 text-xs text-purple-300 font-mono focus:outline-none focus:border-purple-400"
-                    placeholder="dilmhamadmiya2378@upi"
+                    placeholder="6206800093@ybl"
                   />
                 </div>
               </div>

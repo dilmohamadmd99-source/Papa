@@ -18,7 +18,7 @@ function MainApp() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#08090e] text-gray-100 font-sans overflow-hidden">
+    <div className="flex flex-col h-screen w-screen bg-[#030407] text-gray-100 font-sans overflow-hidden">
       {/* Header Bar */}
       <Header
         activeView={activeView}

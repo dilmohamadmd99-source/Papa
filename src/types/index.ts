@@ -89,6 +89,22 @@ export interface PaymentRecord {
   verifiedAt?: string;
 }
 
+export interface UpiPaymentSubmission {
+  id: string;
+  utrNumber: string;
+  userId: string;
+  userEmail: string;
+  planId: string;
+  planName: string;
+  amount: number;
+  durationMonths: number;
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  rejectReason?: string;
+}
+
 export interface DailyUsage {
   userId: string;
   date: string;

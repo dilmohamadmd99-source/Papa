@@ -201,10 +201,10 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
   const lines = activeFile.content.split('\n');
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row bg-[#0a0b10] overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row bg-[#030407] overflow-hidden">
       {/* 1. File Explorer Sidebar */}
-      <div className="w-full md:w-60 bg-[#0e1017] border-b md:border-b-0 md:border-r border-white/10 flex flex-col flex-shrink-0">
-        <div className="p-3 border-b border-white/10 flex items-center justify-between">
+      <div className="w-full md:w-60 bg-[#05060b] border-b md:border-b-0 md:border-r border-white/[0.08] flex flex-col flex-shrink-0">
+        <div className="p-3 border-b border-white/[0.08] flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-gray-200">
             <Code2 className="w-4 h-4 text-purple-400" />
             <span>Files Explorer</span>
@@ -249,7 +249,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
           })}
         </div>
 
-        <div className="p-3 border-t border-white/10 bg-[#0c0d14]">
+        <div className="p-3 border-t border-white/[0.08] bg-[#040509]">
           <button
             onClick={handleDownloadAll}
             className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-semibold text-gray-300 transition-colors"
@@ -261,9 +261,9 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
       </div>
 
       {/* 2. Main Code Editor */}
-      <div className="flex-1 flex flex-col min-w-0 border-b md:border-b-0 md:border-r border-white/10 bg-[#0d0e15]">
+      <div className="flex-1 flex flex-col min-w-0 border-b md:border-b-0 md:border-r border-white/[0.08] bg-[#030408]">
         {/* Editor Tab Bar */}
-        <div className="h-10 bg-[#12141e] border-b border-white/10 flex items-center justify-between px-3">
+        <div className="h-10 bg-[#06070e] border-b border-white/[0.08] flex items-center justify-between px-3">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
             {onBackToChat && (
               <button
@@ -304,7 +304,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
         {/* Code Content Area with Line Numbers */}
         <div className="flex-1 flex overflow-hidden font-mono text-xs">
           {/* Line Numbers */}
-          <div className="w-12 bg-[#0c0d13] text-gray-600 select-none text-right pr-3 pt-3 font-mono leading-6 border-r border-white/5">
+          <div className="w-12 bg-[#040508] text-gray-600 select-none text-right pr-3 pt-3 font-mono leading-6 border-r border-white/[0.06]">
             {lines.map((_, i) => (
               <div key={i}>{i + 1}</div>
             ))}
@@ -321,8 +321,8 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
       </div>
 
       {/* 3. AI Coding Assistant Sidebar */}
-      <div className="w-full md:w-96 bg-[#10121c] flex flex-col flex-shrink-0">
-        <div className="p-3 border-b border-white/10 flex items-center justify-between bg-[#141624]">
+      <div className="w-full md:w-96 bg-[#05060c] border-l border-white/[0.08] flex flex-col flex-shrink-0">
+        <div className="p-3 border-b border-white/[0.08] flex items-center justify-between bg-[#070811]">
           <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
             <Bot className="w-4 h-4 text-purple-400" />
             <span>AI Code Copilot</span>
@@ -333,7 +333,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
         </div>
 
         {/* Quick AI Action Buttons */}
-        <div className="p-3 border-b border-white/10 space-y-2">
+        <div className="p-3 border-b border-white/[0.08] space-y-2">
           <div className="grid grid-cols-3 gap-1.5 text-[11px]">
             <button
               onClick={() => handleRunAIAction('explain')}
@@ -386,7 +386,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
               onChange={(e) => setAiPrompt(e.target.value)}
               placeholder="Custom instructions (e.g. 'Add dark mode toggle')..."
               onKeyDown={(e) => e.key === 'Enter' && handleRunAIAction('generate')}
-              className="w-full bg-[#181a28] border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 pr-9 focus:outline-none focus:border-purple-500/50"
+              className="w-full bg-[#0a0b14] border border-white/[0.08] rounded-xl px-3 py-2 text-xs text-white placeholder-gray-500 pr-9 focus:outline-none focus:border-purple-500/50"
             />
             <button
               onClick={() => handleRunAIAction('generate')}
@@ -409,7 +409,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
             </div>
           ) : aiOutput ? (
             <div className="space-y-3">
-              <div className="flex items-center justify-between pb-2 border-b border-white/10">
+              <div className="flex items-center justify-between pb-2 border-b border-white/[0.08]">
                 <span className="text-[11px] text-gray-400 uppercase font-bold">
                   AI Solution ({activeAction})
                 </span>
@@ -421,7 +421,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({ onBackToChat }) =>
                   <span>Apply to File</span>
                 </button>
               </div>
-              <div className="whitespace-pre-wrap leading-relaxed text-gray-200 bg-[#161824] p-3 rounded-xl border border-white/5">
+              <div className="whitespace-pre-wrap leading-relaxed text-gray-200 bg-[#080912] p-3 rounded-xl border border-white/[0.06]">
                 {aiOutput}
               </div>
             </div>

@@ -29,8 +29,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto animate-in fade-in">
-      <div className="relative w-full max-w-xl bg-[#121420] border border-white/15 rounded-3xl p-6 shadow-2xl text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto animate-in fade-in">
+      <div className="relative w-full max-w-xl bg-[#05060c] border border-white/[0.09] rounded-3xl p-6 shadow-2xl text-white">
         {/* Top Buttons: Back to Chat and Close */}
         <div className="flex items-center justify-between mb-4">
           <button

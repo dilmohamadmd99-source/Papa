@@ -8,6 +8,7 @@ import {
   FileText,
   FileCode,
   Image as ImageIcon,
+  Zap,
 } from 'lucide-react';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import type { Message } from '../../types';
@@ -18,6 +19,7 @@ interface MessageListProps {
   streamingText: string;
   isStreaming: boolean;
   onRegenerate: () => void;
+  onContinue?: () => void;
   onOpenInWorkspace?: (code: string, language: string) => void;
 }
 
@@ -26,6 +28,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   streamingText,
   isStreaming,
   onRegenerate,
+  onContinue,
   onOpenInWorkspace,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -65,17 +68,17 @@ export const MessageList: React.FC<MessageListProps> = ({
             <div
               className={`group relative rounded-2xl p-4 md:p-5 max-w-[85%] md:max-w-[78%] transition-all ${
                 isUser
-                  ? 'bg-gradient-to-r from-purple-700 to-indigo-700 text-white shadow-lg shadow-purple-900/20'
-                  : 'bg-[#131520] border border-white/10 shadow-xl'
+                  ? 'bg-gradient-to-r from-purple-800 to-indigo-900 border border-purple-500/30 text-white shadow-xl shadow-purple-950/40'
+                  : 'bg-[#070810] border border-white/[0.08] shadow-2xl'
               }`}
             >
               {/* Attachments (if any) */}
               {message.attachments && message.attachments.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-3 pb-2 border-b border-white/10">
+                <div className="flex flex-wrap gap-2 mb-3 pb-2 border-b border-white/[0.08]">
                   {message.attachments.map((att) => (
                     <div
                       key={att.id}
-                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 text-xs text-gray-200"
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/60 border border-white/[0.08] text-xs text-gray-200"
                     >
                       {att.type.startsWith('image/') ? (
                         <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
@@ -123,14 +126,27 @@ export const MessageList: React.FC<MessageListProps> = ({
                   </button>
 
                   {isLastAssistant && !isStreaming && (
-                    <button
-                      onClick={onRegenerate}
-                      className="flex items-center gap-1 text-[11px] hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors"
-                      title="Regenerate this response"
-                    >
-                      <RotateCw className="w-3 h-3 text-purple-400" />
-                      <span>Regenerate</span>
-                    </button>
+                    <>
+                      <button
+                        onClick={onRegenerate}
+                        className="flex items-center gap-1 text-[11px] hover:text-white px-2 py-1 rounded hover:bg-white/5 transition-colors cursor-pointer"
+                        title="Regenerate this response"
+                      >
+                        <RotateCw className="w-3 h-3 text-purple-400" />
+                        <span>Regenerate</span>
+                      </button>
+
+                      {onContinue && (
+                        <button
+                          onClick={onContinue}
+                          className="flex items-center gap-1.5 text-[11px] text-amber-300 hover:text-white px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/25 transition-all font-semibold cursor-pointer shadow-xs active:scale-95"
+                          title="Continue generating the next part of this code / project"
+                        >
+                          <Zap className="w-3.5 h-3.5 fill-current text-amber-400" />
+                          <span>⚡ Continue Code (आगे लिखो)</span>
+                        </button>
+                      )}
+                    </>
                   )}
 
                   {(() => {
@@ -168,7 +184,7 @@ export const MessageList: React.FC<MessageListProps> = ({
             <Sparkles className="w-4 h-4 text-white animate-spin" />
           </div>
 
-          <div className="rounded-2xl p-4 md:p-5 max-w-[85%] md:max-w-[78%] bg-[#131520] border border-white/10 shadow-xl">
+          <div className="rounded-2xl p-4 md:p-5 max-w-[85%] md:max-w-[78%] bg-[#070810] border border-white/[0.08] shadow-2xl">
             {streamingText ? (
               <div className="text-sm leading-relaxed">
                 <MarkdownRenderer content={streamingText} onOpenInWorkspace={onOpenInWorkspace} />
