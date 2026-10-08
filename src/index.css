@@ -1,0 +1,132 @@
+@import "tailwindcss";
+@import "prismjs/themes/prism-tomorrow.css";
+
+body {
+  background-color: #08090e;
+  color: #f3f4f6;
+  overflow: hidden;
+  user-select: text;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 85, 247, 0.35);
+}
+
+/* ========================================================================== */
+/* VIBRANT AUTHENTIC SYNTAX HIGHLIGHTING (VS Code Dark+ & OneDark Original Colors) */
+/* ========================================================================== */
+
+pre code,
+code[class*="language-"],
+pre[class*="language-"] {
+  background: transparent !important;
+  text-shadow: none !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+/* Comments */
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6a9955 !important;
+  font-style: italic !important;
+}
+
+/* Punctuation & Brackets */
+.token.punctuation {
+  color: #d4d4d4 !important;
+}
+
+/* Keywords (const, let, function, return, import, class, if, else) */
+.token.keyword,
+.token.atrule {
+  color: #c586c0 !important;
+  font-weight: 600 !important;
+}
+
+/* Functions & Methods */
+.token.function,
+.token.function-name,
+.token.class-name {
+  color: #dcdcaa !important;
+  font-weight: 600 !important;
+}
+
+/* Strings & Template Literals */
+.token.string,
+.token.char,
+.token.attr-value {
+  color: #ce9178 !important;
+}
+
+/* Numbers & Booleans */
+.token.number,
+.token.boolean {
+  color: #b5cea8 !important;
+  font-weight: 500 !important;
+}
+
+/* Variables & Parameters */
+.token.variable,
+.token.parameter {
+  color: #9cdcfe !important;
+}
+
+/* Properties & Keys */
+.token.property {
+  color: #9cdcfe !important;
+}
+
+/* HTML / JSX Tags */
+.token.tag,
+.token.tag .token.punctuation {
+  color: #569cd6 !important;
+}
+
+/* HTML / JSX Attributes */
+.token.attr-name {
+  color: #9cdcfe !important;
+}
+
+/* Constants & Builtins */
+.token.constant,
+.token.builtin {
+  color: #4ec9b0 !important;
+}
+
+/* Operators (=, +, -, *, /, =>, ?) */
+.token.operator {
+  color: #d4d4d4 !important;
+}
+
+/* Regex & Special */
+.token.regex,
+.token.important {
+  color: #d16969 !important;
+}
+
+.token.symbol {
+  color: #569cd6 !important;
+}
+
+.token.selector {
+  color: #d7ba7d !important;
+}
+

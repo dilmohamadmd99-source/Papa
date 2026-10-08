@@ -1,0 +1,164 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User account profile and subscription state",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 128 },
+        "photoURL": { "type": "string", "maxLength": 512 },
+        "role": { "type": "string", "enum": ["user", "owner"] },
+        "planId": { "type": "string", "maxLength": 64 },
+        "subscriptionStatus": { "type": "string", "enum": ["free", "active", "cancelled", "expired"] },
+        "subscriptionStart": { "type": "string", "maxLength": 64 },
+        "subscriptionExpiry": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["uid", "email", "role", "planId", "subscriptionStatus"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "Chat session belonging to a user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 200 },
+        "model": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "title"]
+    },
+    "Message": {
+      "title": "Message",
+      "description": "Message within a conversation",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "conversationId": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "role": { "type": "string", "enum": ["user", "assistant", "system"] },
+        "content": { "type": "string", "maxLength": 65536 },
+        "attachments": { "type": "array" },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "conversationId", "userId", "role", "content"]
+    },
+    "Plan": {
+      "title": "Plan",
+      "description": "Subscription plan definition",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 64 },
+        "name": { "type": "string", "maxLength": 64 },
+        "price": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "durationMonths": { "type": "number" },
+        "features": { "type": "array" },
+        "isActive": { "type": "boolean" },
+        "isPopular": { "type": "boolean" }
+      },
+      "required": ["id", "name", "price", "currency", "durationMonths", "isActive"]
+    },
+    "Subscription": {
+      "title": "Subscription",
+      "description": "User subscription record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "planId": { "type": "string", "maxLength": 64 },
+        "status": { "type": "string", "enum": ["active", "cancelled", "expired"] },
+        "startDate": { "type": "string", "maxLength": 64 },
+        "expiryDate": { "type": "string", "maxLength": 64 },
+        "razorpayPaymentId": { "type": "string", "maxLength": 128 },
+        "razorpayOrderId": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "planId", "status", "startDate", "expiryDate"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Payment transaction history",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "razorpayPaymentId": { "type": "string", "maxLength": 128 },
+        "razorpayOrderId": { "type": "string", "maxLength": 128 },
+        "planId": { "type": "string", "maxLength": 64 },
+        "amount": { "type": "number" },
+        "currency": { "type": "string", "maxLength": 10 },
+        "status": { "type": "string", "enum": ["created", "paid", "failed", "refunded"] },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "verifiedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "razorpayPaymentId", "planId", "amount", "status"]
+    },
+    "Usage": {
+      "title": "Usage",
+      "description": "Daily message count and quota tracker",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 32 },
+        "messageCount": { "type": "number" },
+        "lastUpdated": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "date", "messageCount"]
+    },
+    "AdminLog": {
+      "title": "AdminLog",
+      "description": "Audit logs for owner administrative actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "adminEmail": { "type": "string", "maxLength": 256 },
+        "action": { "type": "string", "maxLength": 128 },
+        "details": { "type": "string", "maxLength": 2048 },
+        "timestamp": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "adminEmail", "action", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile and subscription document"
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "User conversation sessions"
+    },
+    "/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Messages inside conversations"
+    },
+    "/plans/{planId}": {
+      "schema": { "$ref": "#/entities/Plan" },
+      "description": "Public subscription plans"
+    },
+    "/subscriptions/{subscriptionId}": {
+      "schema": { "$ref": "#/entities/Subscription" },
+      "description": "Subscription records per user"
+    },
+    "/payments/{paymentId}": {
+      "schema": { "$ref": "#/entities/Payment" },
+      "description": "Payment records per user"
+    },
+    "/usage/{userId}": {
+      "schema": { "$ref": "#/entities/Usage" },
+      "description": "Usage counters for rate limiting"
+    },
+    "/adminLogs/{logId}": {
+      "schema": { "$ref": "#/entities/AdminLog" },
+      "description": "Owner audit logs"
+    }
+  }
+}

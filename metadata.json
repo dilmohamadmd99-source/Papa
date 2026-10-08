@@ -1,0 +1,6 @@
+{
+  "name": "REHAN AI",
+  "description": "Your AI Assistant for Coding, Learning & Productivity with persistent memory, multi-file coding workspace, and premium tier.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
